@@ -3,13 +3,20 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
-using static GameManager;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
+    public Button testBtn;
+    /// <summary>
+    /// 流程组件
+    /// </summary>
+    [Module(2)]
+    public static ProcedureModule Procedure { get => TGameFramework.Instance.GetModule<ProcedureModule>(); }
     [Module(6)]
     public static MessageModule Message { get => TGameFramework.Instance.GetModule<MessageModule>(); }
     private bool activing;
+    
     private void Awake()
     {
         
@@ -30,7 +37,15 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         TGameFramework.Instance.StartModules();
-        
+        testBtn.onClick.AddListener(() => 
+        {
+            GameManager.Message.Subscribe<MessageType.Login>(async (arg)=> 
+            {
+                Debug.Log("本地消息进行了触发");
+            });
+            GameManager.Message.Post<MessageType.Login>(new MessageType.Login());
+        });
+        Procedure.StartProcedure();
     }
 
     // Update is called once per frame
