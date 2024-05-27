@@ -14,17 +14,21 @@ namespace TGame.Editor.Inspector
     [CustomEditor(typeof(ProcedureModule))]
     public class ProcedureModuleInspector : BaseInspector
     {
+        //表示序列化对象中的一个属性或字段的类
         private SerializedProperty proceduresProperty;
         private SerializedProperty defaultProcedureProperty;
-
+        //所有的流程模块的类型
         private List<string> allProcedureTypes;
 
         protected override void OnInspectorEnable()
         {
             base.OnInspectorEnable();
+            //在serializedObject中查找一个名为proceduresNames的属性
+            //在序列化对象中查找具有指定名称的属性
             proceduresProperty = serializedObject.FindProperty("proceduresNames");
+            //proceduresProperty = serializedObject.FindProperty("isTest");
             defaultProcedureProperty = serializedObject.FindProperty("defaultProcedureName");
-
+            //Debug.Log("::::::::::::::::"+proceduresProperty.boolValue);
             UpdateProcedures();
         }
 
@@ -36,17 +40,24 @@ namespace TGame.Editor.Inspector
 
         private void UpdateProcedures()
         {
+            //来获取BaseProcedure类型的所有子类，并将这些子类的全名（FullName属性）转换为一个字符串列表
+            // false 用于指示是否包含接口作为子类
             allProcedureTypes = Utility.Types.GetAllSubclasses(typeof(BaseProcedure), false, Utility.Types.GAME_CSHARP_ASSEMBLY).ConvertAll((Type t) => { return t.FullName; });
 
             //移除不存在的procedure
             for (int i = proceduresProperty.arraySize - 1; i >= 0; i--)
             {
+                //得到流程数组中元素的字符串值
+                //GetArrayElementAtIndex 或 FindPropertyRelative 方法来导航到其子属性
                 string procedureTypeName = proceduresProperty.GetArrayElementAtIndex(i).stringValue;
+                //判断所有的流程类型是否含有这个类型，如果没有就从数组中移除
                 if (!allProcedureTypes.Contains(procedureTypeName))
                 {
                     proceduresProperty.DeleteArrayElementAtIndex(i);
                 }
             }
+            //提交对proceduresProperty的修改
+            //将所有通过SerializedProperty进行的修改应用到原始的MonoBehaviour或ScriptableObject实例上
             serializedObject.ApplyModifiedProperties();
         }
 
@@ -62,6 +73,7 @@ namespace TGame.Editor.Inspector
                         {
                             GUI.changed = false;
                             int? index = FindProcedureTypeIndex(allProcedureTypes[i]);
+                            //HasValue 属性来检查该实例是否包含一个值
                             bool selected = EditorGUILayout.ToggleLeft(allProcedureTypes[i], index.HasValue);
                             if (GUI.changed)
                             {
@@ -122,6 +134,7 @@ namespace TGame.Editor.Inspector
 
         private void AddProcedure(string procedureType)
         {
+            //在数组的开始位置插入一个新元素
             proceduresProperty.InsertArrayElementAtIndex(0);
             proceduresProperty.GetArrayElementAtIndex(0).stringValue = procedureType;
         }

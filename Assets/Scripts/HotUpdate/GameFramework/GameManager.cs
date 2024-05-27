@@ -46,6 +46,7 @@ public class GameManager : MonoBehaviour
             GameManager.Message.Post<MessageType.Login>(new MessageType.Login());
         });
         Procedure.StartProcedure();
+        GameManager.Procedure.ChangeProcedure<InitProcedure>();
     }
 
     // Update is called once per frame

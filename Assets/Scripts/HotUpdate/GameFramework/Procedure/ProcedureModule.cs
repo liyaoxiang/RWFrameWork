@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using UnityEditor;
 using UnityEngine;
 /// <summary>
 /// 处理游戏总流程,控制游戏过程
@@ -13,6 +14,8 @@ public partial class ProcedureModule :BaseGameModule
     [SerializeField]
     private string defaultProcedureName = null;
 
+    //[SerializeField]
+    //private bool isTest {  get; set; }
     public BaseProcedure CurrentProcedure {  get; private set; }
     public bool IsRunning {  get; private set; }
     public bool IsChangingProcedure {  get; private set; }
@@ -21,11 +24,10 @@ public partial class ProcedureModule :BaseGameModule
     private BaseProcedure defaultProcedure;
     private ObjectPool<ChangeProcedureRequest> changeProcedureRequestPool = new ObjectPool<ChangeProcedureRequest>(null);
     private Queue<ChangeProcedureRequest> changeProcedureQ = new Queue<ChangeProcedureRequest>();
-
     protected internal override void OnModuleInit()
     {
         base.OnModuleInit();
-        procedures=new Dictionary<Type, BaseProcedure>();
+        procedures =new Dictionary<Type, BaseProcedure>();
         bool findDefaultState = false;
         for (int i = 0; i < proceduresNames.Length; i++)
         {
