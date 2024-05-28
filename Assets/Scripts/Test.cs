@@ -29,12 +29,13 @@ public class Test : MonoBehaviour
         //PreOrderTraversal(root); // 输出: 1 2 4 5 3   
 
 
-        Debug.Log("InOrderTraversal:");
-        InOrderTraversal(root); // 输出: 4 2 5 1 3   
+        //Debug.Log("InOrderTraversal:");
+        //InOrderTraversal(root); // 输出: 4 2 5 1 3   
 
 
         //Debug.Log("PostOrderTraversal:");
         //PostOrderTraversal(root); // 输出: 4 5 2 3 1   
+
     }
 
     // Update is called once per frame

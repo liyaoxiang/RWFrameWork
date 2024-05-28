@@ -1,7 +1,10 @@
+using Koakuma.Game.UI;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using TGame.Asset;
+using TGame.UI;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,10 +12,17 @@ public class GameManager : MonoBehaviour
 {
     public Button testBtn;
     /// <summary>
+    /// 资源组件
+    /// </summary>
+    [Module(1)]
+    public static AssetModule Asset { get => TGameFramework.Instance.GetModule<AssetModule>(); }
+    /// <summary>
     /// 流程组件
     /// </summary>
     [Module(2)]
     public static ProcedureModule Procedure { get => TGameFramework.Instance.GetModule<ProcedureModule>(); }
+    [Module(3)]
+    public static UIModule UI { get => TGameFramework.Instance.GetModule<UIModule>(); }
     [Module(6)]
     public static MessageModule Message { get => TGameFramework.Instance.GetModule<MessageModule>(); }
     private bool activing;
@@ -46,7 +56,8 @@ public class GameManager : MonoBehaviour
             GameManager.Message.Post<MessageType.Login>(new MessageType.Login());
         });
         Procedure.StartProcedure();
-        GameManager.Procedure.ChangeProcedure<InitProcedure>();
+        //GameManager.Procedure.ChangeProcedure<InitProcedure>();
+        GameManager.UI.OpenUI(UIViewID.LoginUI);
     }
 
     // Update is called once per frame

@@ -76,8 +76,11 @@ namespace Config
                 JObject dataObject = array[i] as JObject;
                 UIConfig data = (UIConfig)dataObject.ToObject(typeof(UIConfig));
                 datas.Add(data);
+                
+                UnityEngine.Debug.Log(":::::::::::"+data.ID);
                 indexMap.Add(data.ID, i);
             }
+            UnityEngine.Debug.Log(indexMap.Count);
         }
         public static int Count;
         private static List<UIConfig> datas;
