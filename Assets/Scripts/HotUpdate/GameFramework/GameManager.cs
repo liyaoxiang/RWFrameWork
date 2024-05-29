@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using TGame.Asset;
+using TGame.ECS;
 using TGame.UI;
 using UnityEngine;
 using UnityEngine.UI;
@@ -25,6 +26,8 @@ public class GameManager : MonoBehaviour
     public static UIModule UI { get => TGameFramework.Instance.GetModule<UIModule>(); }
     [Module(6)]
     public static MessageModule Message { get => TGameFramework.Instance.GetModule<MessageModule>(); }
+    [Module(7)]
+    public static ECSModule ECS { get => TGameFramework.Instance.GetModule<ECSModule>(); }
     private bool activing;
     
     private void Awake()
@@ -44,18 +47,18 @@ public class GameManager : MonoBehaviour
         TGameFramework.Instance.InitModules();
     }
     // Start is called before the first frame update
-    void Start()
+    async void Start()
     {
         TGameFramework.Instance.StartModules();
-        testBtn.onClick.AddListener(() => 
+        testBtn.onClick.AddListener(async () => 
         {
             GameManager.Message.Subscribe<MessageType.Login>(async (arg)=> 
             {
                 Debug.Log("本地消息进行了触发");
             });
-            GameManager.Message.Post<MessageType.Login>(new MessageType.Login());
+           await GameManager.Message.Post<MessageType.Login>(new MessageType.Login());
         });
-        Procedure.StartProcedure();
+       await Procedure.StartProcedure();
         //GameManager.Procedure.ChangeProcedure<InitProcedure>();
         GameManager.UI.OpenUI(UIViewID.LoginUI);
     }
