@@ -21,9 +21,9 @@ namespace TGame.UI
         private static Dictionary<UIViewID, Type> MEDIATOR_MAPPING;
         private static Dictionary<UIViewID, Type> ASSET_MAPPING;
 
-        private readonly List<UIMediator> usingMediators = new List<UIMediator>();
+        private readonly List<UIMediator> usingMediators = new List<UIMediator>();//正在使用的
         private readonly Dictionary<Type, Queue<UIMediator>> freeMediators = new Dictionary<Type, Queue<UIMediator>>();
-        private readonly GameObjectPool<GameObjectAsset> uiObjectPool = new GameObjectPool<GameObjectAsset>();
+        private readonly GameObjectPool<GameObjectAsset> uiObjectPool = new GameObjectPool<GameObjectAsset>();//ui的所有对象
         private QuantumConsole quantumConsole;
 
         protected internal override void OnModuleInit()
@@ -208,7 +208,7 @@ namespace TGame.UI
             UIMediator mediator = GetMediator(id);
             if (mediator == null)
                 return null;
-
+            
             Type requiredMediatorType = mediator.GetType();
             foreach (var item in usingMediators)
             {

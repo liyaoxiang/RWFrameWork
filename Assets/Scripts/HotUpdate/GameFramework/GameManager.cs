@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Threading.Tasks;
 using TGame.Asset;
 using TGame.ECS;
 using TGame.UI;
@@ -52,15 +53,20 @@ public class GameManager : MonoBehaviour
         TGameFramework.Instance.StartModules();
         testBtn.onClick.AddListener(async () => 
         {
-            GameManager.Message.Subscribe<MessageType.Login>(async (arg)=> 
+            GameManager.Message.Subscribe<MessageType.Login>( async (arg)=> 
             {
                 Debug.Log("本地消息进行了触发");
             });
            await GameManager.Message.Post<MessageType.Login>(new MessageType.Login());
         });
        await Procedure.StartProcedure();
-        //GameManager.Procedure.ChangeProcedure<InitProcedure>();
+        await GameManager.Procedure.ChangeProcedure<InitProcedure>();
         GameManager.UI.OpenUI(UIViewID.LoginUI);
+        //await Task.Delay(400);
+        //GameManager.UI.CloseUI(UIViewID.LoginUI);
+        //await Task.Delay(800);
+        //GameManager.UI.OpenUI(UIViewID.LoginUI);
+
     }
 
     // Update is called once per frame
