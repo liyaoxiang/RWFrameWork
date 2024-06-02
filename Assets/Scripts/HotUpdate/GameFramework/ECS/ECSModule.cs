@@ -75,16 +75,21 @@ namespace TGame.ECS
                 if (type.GetCustomAttribute<ECSSystemAttribute>(true) != null)
                 {
                     // AwakeSystem
+                    // 定义IAwakeSystem接口的类型
                     Type awakeSystemType = typeof(IAwakeSystem);
+                    // 检查当前类型是否实现了IAwakeSystem接口
                     if (awakeSystemType.IsAssignableFrom(type))
                     {
+                        // 检查字典中是否已经包含该类型的实例
                         if (awakeSystemMap.ContainsKey(type))
                         {
-                            UnityLog.Error($"Duplicated Awake System:{type.FullName}");
+                            // 如果包含，记录错误信息并继续下一个类型
+                            UnityLog.Error($"Duplicated Awake System: {type.FullName}");
                             continue;
                         }
-
+                        // 使用反射创建该类型的实例，并强制转换为IAwakeSystem
                         IAwakeSystem awakeSystem = Activator.CreateInstance(type) as IAwakeSystem;
+                       // 将类型和实例添加到字典中
                         awakeSystemMap.Add(type, awakeSystem);
                     }
 
@@ -157,14 +162,16 @@ namespace TGame.ECS
                     Type entityMessageType = typeof(IEntityMessageHandler);
                     if (entityMessageType.IsAssignableFrom(type))
                     {
+                        // 使用反射创建该类型的实例，并强制转换为IEntityMessageHandler接口
                         IEntityMessageHandler entityMessageHandler = Activator.CreateInstance(type) as IEntityMessageHandler;
-
+                        // 尝试从字典中获取与消息类型对应的处理程序列表
                         if (!entityMessageHandlerMap.TryGetValue(entityMessageHandler.MessageType(), out List<IEntityMessageHandler> list))
                         {
+                            // 如果字典中不存在该消息类型的处理程序列表，则创建一个新的列表
                             list = new List<IEntityMessageHandler>();
+                            // 将新的处理程序列表添加到字典中，键为消息类型
                             entityMessageHandlerMap.Add(entityMessageHandler.MessageType(), list);
                         }
-
                         list.Add(entityMessageHandler);
                     }
                 }
@@ -172,19 +179,24 @@ namespace TGame.ECS
                 if (type.GetCustomAttribute<EntityRpcHandlerAttribute>(true) != null)
                 {
                     // EntityRPC
+                    // 定义IEntityRpcHandler接口的类型
                     Type entityMessageType = typeof(IEntityRpcHandler);
+                    // 检查当前类型是否实现了IEntityRpcHandler接口
                     if (entityMessageType.IsAssignableFrom(type))
                     {
+                        // 使用反射创建该类型的实例，并强制转换为IEntityRpcHandler接口
                         IEntityRpcHandler entityRpcHandler = Activator.CreateInstance(type) as IEntityRpcHandler;
-
+                        // 检查字典中是否已经包含该RPC类型的处理程序实例
                         if (entityRpcHandlerMap.ContainsKey(entityRpcHandler.RpcType()))
                         {
-                            UnityLog.Error($"Duplicate Entity Rpc, type:{entityRpcHandler.RpcType().FullName}");
+                            // 如果字典中已包含该RPC类型的处理程序实例，记录错误信息并继续下一个类型
+                            UnityLog.Error($"Duplicate Entity Rpc, type: {entityRpcHandler.RpcType().FullName}");
                             continue;
                         }
-
+                        // 将RPC类型和处理程序实例添加到字典中
                         entityRpcHandlerMap.Add(entityRpcHandler.RpcType(), entityRpcHandler);
                     }
+
                 }
             }
         }
@@ -193,19 +205,26 @@ namespace TGame.ECS
         {
             foreach (IUpdateSystem updateSystem in updateSystemMap.Values)
             {
+                // 从字典updateSystemRelatedEntityMap中获取与updateSystem相关的实体列表
                 List<ECSEntity> updateSystemRelatedEntities = updateSystemRelatedEntityMap[updateSystem];
+
+                // 如果相关实体列表为空，则跳过本次循环
                 if (updateSystemRelatedEntities.Count == 0)
                     continue;
-
+                // 从对象池中获取一个新的实体列表
                 List<ECSEntity> entityList = ListPool<ECSEntity>.Obtain();
+                // 将相关实体列表中的所有实体添加到新获取的实体列表中
                 entityList.AddRangeNonAlloc(updateSystemRelatedEntities);
+                // 遍历新获取的实体列表中的每个实体
                 foreach (var entity in entityList)
                 {
+                    // 如果updateSystem不观察该实体，则跳过当前实体
                     if (!updateSystem.ObservingEntity(entity))
                         continue;
-
+                    // 调用updateSystem的Update方法更新当前实体
                     updateSystem.Update(entity);
                 }
+
 
                 ListPool<ECSEntity>.Release(entityList);
             }
@@ -268,6 +287,7 @@ namespace TGame.ECS
 
         public void AwakeComponent<C>(C component) where C : ECSComponent
         {
+            
             UpdateSystemEntityList(component.Entity);
 
             List<IAwakeSystem> list = ListPool<IAwakeSystem>.Obtain();
@@ -438,21 +458,28 @@ namespace TGame.ECS
             foreach (IUpdateSystem updateSystem in updateSystemMap.Values)
             {
                 // update entity list
+                // 从字典updateSystemRelatedEntityMap中获取与updateSystem相关的实体列表
                 List<ECSEntity> entityList = updateSystemRelatedEntityMap[updateSystem];
+                // 检查实体列表是否包含指定的实体
                 if (!entityList.Contains(entity))
                 {
+                    // 如果实体列表不包含该实体，检查含有IUpdateSystem组件
                     if (updateSystem.ObservingEntity(entity))
                     {
+                        // 如果含有将其添加到实体列表中
                         entityList.Add(entity);
                     }
                 }
                 else
                 {
+                    // 如果实体列表包含该实体，检查含有IUpdateSystem组件
                     if (!updateSystem.ObservingEntity(entity))
                     {
+                        // 如果没有，将其从实体列表中移除
                         entityList.Remove(entity);
                     }
                 }
+
             }
 
             foreach (ILateUpdateSystem lateUpdateSystem in lateUpdateSystemMap.Values)
@@ -508,6 +535,7 @@ namespace TGame.ECS
 
             entities.Remove(entity.InstanceID);
             ECSScene scene = entity.Scene;
+            //将实体从场景中移除
             scene?.RemoveEntity(entity.InstanceID);
         }
 
@@ -563,6 +591,7 @@ namespace TGame.ECS
             if (!entityRpcHandlerMap.TryGetValue(messageType, out IEntityRpcHandler entityRpcHandler))
                 return new Response() { Error = true };
 
+            // 将entityRpcHandler强制转换为IEntityRpcHandler<Request, Response>类型的处理程序
             IEntityRpcHandler<Request, Response> handler = entityRpcHandler as IEntityRpcHandler<Request, Response>;
             if (handler == null)
                 return new Response() { Error = true };

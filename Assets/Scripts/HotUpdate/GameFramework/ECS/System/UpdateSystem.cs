@@ -11,8 +11,10 @@ namespace TGame.ECS
     {
         public bool ObservingEntity(ECSEntity entity)
         {
+            // 如果实体没有C1组件，则返回false
             if (!entity.HasComponent<C1>())
                 return false;
+
 
             return true;
         }

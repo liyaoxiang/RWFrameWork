@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace TGame.ECS
 {
+    //IDisposable:用于显式释放非托管资源的接口
     public class ECSEntity : IDisposable
     {
         public long InstanceID { get; private set; }
